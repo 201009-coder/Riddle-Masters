@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="theme-color" content="#0d1024">
+<meta name="mobile-web-app-title" content="Riddle Masters">
+
+<title>Riddle Masters - 500 Levels</title>
+<style>
+:root { box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: -apple-system, system-ui, "Segoe UI", Roboto, sans-serif; background: linear-gradient(160deg, #1b1f3b, #0d1024); color: #f4f6ff; min-height: 100%; -webkit-tap-highlight-color: transparent; }
+header { max-width: 480px; margin: 0 auto; padding: 16px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+h1 { font-size: 20px; margin: 0; user-select: none; }
+.coins { font-size: 15px; background: rgba(255,215,0,.15); color: #ffd84d; padding: 6px 12px; border-radius: 99px; }
+main { max-width: 480px; margin: 0 auto; padding: 8px 16px 32px; }
+.card { background: rgba(255,255,255,.07); border-radius: 20px; padding: 22px; }
+.lvl { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; opacity: .6; }
+.q { font-size: 20px; line-height: 1.4; margin: 10px 0 18px; font-weight: 600; }
+.stat { font-size: 14px; opacity: .8; margin-bottom: 10px; }
+.opts { display: flex; flex-direction: column; gap: 10px; }
+button { font: inherit; color: inherit; border: 0; cursor: pointer; background: rgba(255,255,255,.12); border-radius: 14px; padding: 14px; font-size: 16px; transition: transform .1s, background .2s; }
+button:active { transform: scale(.97); }
+button:disabled { opacity: .35; cursor: default; }
+button.ok { background: #22c55e; color: #052e16; }
+button.bad { background: #ef4444; }
+.primary { background: #7c5cff; font-weight: 600; }
+.shop { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+.shop button { font-size: 14px; padding: 12px 8px; }
+.emojis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.emojis button { font-size: 40px; padding: 18px 0; }
+input { width: 100%; font: inherit; font-size: 18px; padding: 14px; border-radius: 14px; border: 2px solid rgba(255,255,255,.2); background: rgba(0,0,0,.25); color: #fff; outline: none; }
+input:focus { border-color: #7c5cff; }
+.row { display: flex; gap: 10px; margin-top: 12px; }
+.row > * { flex: 1; }
+.msg { min-height: 22px; margin-top: 14px; text-align: center; font-size: 15px; }
+.hint { color: #ffd84d; font-size: 15px; text-align: center; margin-top: 6px; min-height: 20px; }
+.grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; max-height: 60vh; overflow-y: auto; margin-top: 10px; padding-right: 4px; }
+.grid button { padding: 12px 0; font-size: 14px; font-weight: 600; }
+.grid button.done { background: #22c55e; color: #052e16; }
+.grid button.locked { opacity: .3; }
+.hidden { display: none !important; }
+.back { background: transparent; padding: 6px 0; font-size: 15px; opacity: .8; }
+.admin { border: 1px solid #ffd84d; }
+.admin .row { flex-wrap: wrap; }
+.admin h2 { font-size: 16px; margin: 0 0 10px; color: #ffd84d; }
+.admin button { font-size: 14px; }
+.off { opacity: .25 !important; }
+#userTag { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; min-width: 90px; }
+#userTag b { font-size: 15px; }
+#userTag .coins { font-size: 12px; padding: 3px 8px; }
+#switchBtn, #closeAuth { padding: 8px 12px; font-size: 18px; border-radius: 12px; min-width: 44px; }
+.home { display: flex; flex-direction: column; gap: 14px; text-align: center; }
+.hero { padding: 24px 8px 4px; }
+.logo { font-size: 64px; filter: drop-shadow(0 8px 20px rgba(124,92,255,.5)); }
+.hero h2 { font-size: 30px; margin: 6px 0 4px; background: linear-gradient(90deg, #c7b8ff, #7c5cff, #ffd84d); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p { margin: 0; opacity: .7; font-size: 15px; }
+.stats3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.stats3 div { background: rgba(255,255,255,.07); border-radius: 16px; padding: 12px 4px; }
+.stats3 b { display: block; font-size: 22px; }
+.stats3 span { font-size: 11px; opacity: .6; text-transform: uppercase; letter-spacing: .5px; }
+.bigbtn { padding: 18px; font-size: 18px; font-weight: 700; background: linear-gradient(90deg, #7c5cff, #a25cff); box-shadow: 0 10px 30px rgba(124,92,255,.35); }
+.bigbtn.alt { background: rgba(255,255,255,.12); box-shadow: none; }
+.shopcard { background: rgba(255,255,255,.07); border-radius: 18px; padding: 16px; text-align: left; }
+.shopcard h3 { margin: 0 0 8px; font-size: 16px; }
+.price { display: flex; justify-content: space-between; padding: 9px 2px; border-bottom: 1px solid rgba(255,255,255,.08); font-size: 15px; }
+.price b { color: #ffd84d; }
+.ghost { background: transparent; border: 1px dashed rgba(255,255,255,.3); width: 100%; margin-top: 10px; font-size: 14px; }
+</style>
+</head>
+<body>
+<header>
+  <button id="closeAuth" class="mini" title="Close">✕</button>
+  <div id="userTag"><b id="uname"></b><div class="coins" id="coins"></div></div>
+  <h1 id="title">🧠 Riddle Masters</h1>
+  <button id="switchBtn" class="mini" title="Switch account">🔁</button>
+</header>
+<main>
+  <section id="home" class="home">
+    <div class="hero">
+      <div class="logo">🧠</div>
+      <h2>Riddle Masters</h2>
+      <p>500 levels of tricky riddles, math and logic. Think sideways.</p>
+    </div>
+    <div class="stats3">
+      <div><b id="hSolved">0</b><span>Solved</span></div>
+      <div><b id="hLevel">1</b><span>Current</span></div>
+      <div><b id="hCoins">0</b><span>Coins</span></div>
+    </div>
+    <button class="bigbtn" id="playBtn">▶ Continue</button>
+    <button class="bigbtn alt" id="levelsBtn">🗂 All 500 levels</button>
+    <button class="ghost" id="adminHome">🛠 Admin panel</button>
+    <div class="shopcard">
+      <h3>🪙 Coin shop</h3>
+      <div class="price"><span>💡 Hint</span><b>15</b></div>
+      <div class="price"><span>⏭ Skip level</span><b>30</b></div>
+      <div class="price"><span>✅ Solve a level</span><b>+10</b></div>
+      
+    </div>
+  </section>
+
+  <section id="menu" class="card hidden">
+    <button class="back" id="homeFromMenu">← Home</button>
+    <div class="stat" id="stat"></div>
+    <div class="row"><button id="adminBtn" class="hidden">🛠 Admin</button></div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section id="play" class="card hidden">
+    <div class="row"><button class="back" id="back">← Levels</button><button class="back" id="homeFromPlay">🏠 Home</button></div>
+    <div class="lvl" id="lvlLabel"></div>
+    <div class="q" id="question"></div>
+    <div id="area"></div>
+    <div class="msg" id="msg"></div>
+    <div class="hint" id="hint"></div>
+    <div class="shop">
+      <button id="hintBtn">💡 Hint (15)</button>
+      <button id="skipBtn">⏭ Skip (30)</button>
+      
+
+    </div>
+    <div class="row hidden" id="nextRow"><button class="primary" id="next">Next level →</button></div>
+  </section>
+
+  <section id="auth" class="card hidden">
+    <div class="hero"><div class="logo" style="font-size:44px">🧠</div><h2 style="font-size:24px;margin:4px 0">Welcome</h2><p>Create an account first to start playing</p></div>
+    <div class="row"><button class="primary" id="tabSignup">Create account</button><button id="tabLogin">Login</button></div>
+    <div class="row" style="margin-top:12px"><input id="authUser" placeholder="Username" maxlength="16" autocomplete="username"></div>
+    <div class="row"><input id="authPass" type="password" placeholder="Password" autocomplete="current-password"></div>
+    <div class="row"><button class="bigbtn" id="authGo">Login</button></div>
+    <div class="msg" id="authMsg"></div>
+  </section>
+
+  <section id="gate" class="card hidden">
+    <button class="back" id="gateBack">← Home</button>
+    <h2 style="margin:6px 0 12px">🔒 Admin passcode</h2>
+    <div class="row"><input id="passIn" type="password" placeholder="Passcode"></div>
+    <div class="row"><button class="primary" id="passGo">Unlock</button></div>
+    <div class="msg" id="passMsg"></div>
+  </section>
+
+  <section id="admin" class="card admin hidden">
+    <div class="row" style="align-items:center;margin-top:0"><button id="closeAdminX" class="mini" style="flex:0 0 auto">✕</button><h2 style="margin:0">🛠 Admin panel</h2></div>
+    <div class="row"><button id="unlimBtn"></button><button id="add1k">+1000 coins</button></div>
+    <div class="stat" id="solvedStat"></div>
+    <div class="stat">Levels open for players: <b id="openCount"></b> / 500</div>
+    <div class="row"><button id="open10">Open +10 levels</button><button id="openAll">Open all 500</button></div>
+    <div class="row"><button id="lockBack">Lock to level 1</button><button id="startAgain">Start again</button></div>
+    <div class="row"><input id="jumpIn" type="number" min="1" max="500" placeholder="Level 1-500"><button id="jumpBtn">Open level</button></div>
+    <h3 style="margin:14px 0 6px;color:#ffd84d">👥 Users</h3>
+    <div class="row"><input id="newUser" placeholder="New username" maxlength="16"><button id="addUser">Add</button></div>
+    <div id="userList"></div>
+    <div class="row"><button id="logoutAdmin">Log out admin</button><button id="closeAdmin">Close</button></div>
+  </section>
+</main>
+
+<script>
+const KEY = "brainPuzzleV2";
+const TOTAL = 500;
+const HINT_COST = 15, SKIP_COST = 30, WIN_REWARD = 10;
+
+let S = { progress: 0, coins: 30, admin: false, unlimited: false, maxOpen: 1, users: [], me: null };
+try { Object.assign(S, JSON.parse(localStorage.getItem(KEY)) || {}); } catch (e) {}
+S.admin = false;
+const _startCoins = S.coins;
+delete S.coins;
+S._guest = _startCoins;
+Object.defineProperty(S, "coins", { enumerable: false, configurable: true,
+  get() { const u = S.users.find(x => x.name === S.me); return u ? u.coins : S._guest; },
+  set(v) { const u = S.users.find(x => x.name === S.me); if (u) u.coins = v; else S._guest = v; } });
+const _startProg = S.progress, _startMax = S.maxOpen;
+delete S.progress; delete S.maxOpen;
+S._gProg = _startProg; S._gMax = _startMax;
+Object.defineProperty(S, "progress", { enumerable: false, configurable: true,
+  get() { const u = S.users.find(x => x.name === S.me); return u ? (u.progress || 0) : S._gProg; },
+  set(v) { const u = S.users.find(x => x.name === S.me); if (u) u.progress = v; else S._gProg = v; } });
+Object.defineProperty(S, "maxOpen", { enumerable: false, configurable: true,
+  get() { const u = S.users.find(x => x.name === S.me); return u ? (u.maxOpen === undefined ? 1 : u.maxOpen) : S._gMax; },
+  set(v) { const u = S.users.find(x => x.name === S.me); if (u) u.maxOpen = v; else S._gMax = v; } });
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+const $ = id => document.getElementById(id);
+
+// Riddles: ["c",q,opts,correctIdx] | ["p",q,emojis,correctIdx] | ["t",q,acceptedAnswers]
+const RIDDLES = [
+  ["c","What has keys but cannot open locks?",["Piano","Map","Car","Door"],0],
+  ["t","What gets wetter the more it dries?",["towel"]],
+  ["c","How many months have 28 days?",["1","12","6"],1],
+  ["p","Tap the one that doesn't belong.",["🍎","🍌","🥕","🍇"],2],
+  ["t","What has hands but cannot clap?",["clock","watch"]],
+  ["c","Which weighs more: a kilo of feathers or a kilo of steel?",["Feathers","Steel","They weigh the same"],2],
+  ["t","The more you take, the more you leave behind. What am I?",["footsteps","footstep"]],
+  ["c","What can you break without touching it?",["Glass","A promise","Rock","Mirror"],1],
+  ["p","Tap the one that is different from the others.",["🔴","🟢","🔵","🎂"],3],
+  ["t","What has a neck but no head?",["bottle"]],
+  ["c","A farmer has 17 sheep and all but 9 run away. How many are left?",["8","9","17","0"],1],
+  ["t","What begins with T, ends with T, and has T in it?",["teapot"]],
+  ["c","If you have me, you want to share me. If you share me, you don't have me. What am I?",["A secret","A cake","A joke","Money"],0],
+  ["p","Tap the moon.",["⚽","🌕","🍊","🎈"],1],
+  ["t","What can fill a room but takes up no space?",["light"]],
+  ["c","What is always in front of you but can't be seen?",["The future","Air","A wall","A ghost"],0],
+  ["t","What word becomes shorter when you add two letters to it?",["short"]],
+  ["c","Mary's father has five daughters: Nana, Nene, Nini, Nono. What is the fifth one called?",["Mary","Nunu","Nona","Nina"],0],
+  ["p","Tap the animal that is not a mammal.",["🐬","🐘","🦈","🐴"],2],
+  ["t","What runs but never walks, has a mouth but never talks?",["river"]],
+  ["c","What has many teeth but cannot bite?",["Comb","Saw","Zipper","Gear"],0],
+  ["t","I am tall when I am young and short when I am old. What am I?",["candle"]],
+  ["c","A rooster lays an egg on the peak of a roof. Which way does it roll?",["Left","Right","Roosters don't lay eggs","Down"],2],
+  ["p","Tap the thing that gets bigger when you take away from it.",["🕳️","🧱","🪨","💰"],0],
+  ["t","What has an eye but cannot see?",["needle"]],
+  ["c","Which month has 28 days?",["February","March","All of them","None"],2],
+  ["t","What is so fragile that saying its name breaks it?",["silence"]],
+  ["c","What can travel around the world while staying in one corner?",["A stamp","A map","A bird","A ship"],0],
+  ["p","Tap the thing that can be drawn but never seen.",["🖼️","🌬️","🎭","📷"],1],
+  ["t","What has a head and a tail but no body?",["coin"]],
+  ["c","What is black when you buy it, red when you use it, and grey when you throw it away?",["Charcoal","Paint","Ink","Coal"],0],
+  ["t","What has to be broken before you can use it?",["egg"]],
+  ["c","Which letter is not in the name of any US state?",["Q","Z","X","J"],0],
+  ["p","Tap the star.",["🌟","🌙","🪐","🌍"],0],
+  ["t","What goes up but never comes down?",["age"]],
+  ["c","A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much is the ball?",["10 cents","5 cents","1 cent","9 cents"],1],
+  ["t","What has four fingers and a thumb but is not alive?",["glove"]],
+  ["c","What is seen in the middle of March and April that can't be seen at the beginning or end of either?",["The letter R","The moon","A rainbow","A cloud"],0],
+  ["p","Tap the mammal that can fly.",["🦇","🐦","🦋","🐝"],0],
+  ["t","What can you catch but not throw?",["cold"]],
+  ["c","What must you give before you can keep it?",["Your word","A gift","Money","A receipt"],0],
+  ["t","Forward I am heavy, but backward I am not. What am I?",["ton"]],
+  ["c","What belongs to you but other people use it more than you do?",["Your name","Your phone","Your car","Your shoes"],0],
+  ["p","Tap the thing that has a face but no eyes.",["🕐","🧑","🎭","🍄"],0],
+  ["t","What can be cracked, made, told, and played?",["joke"]],
+  ["c","What do you get if you cross a snowman with a vampire?",["Frostbite","Blood ice","Snow fang","Chilly"],0],
+  ["t","What kind of room has no doors or windows?",["mushroom"]],
+  ["c","How many times can you subtract 5 from 25?",["Once","Five times","Zero times","Never"],0],
+  ["p","Tap the thing that has keys but no locks.",["⌨️","🚗","🏠","🚪"],0],
+  ["t","What can you hold without ever touching it?",["breath","your breath"]],
+  ["c","What word is always pronounced wrong?",["Wrong","Pronounce","Mispronounce","Yes"],2],
+  ["t","What has many keys but can't open a single door?",["piano","keyboard"]]
+];
+
+// Generated puzzles for levels 53-500: deterministic per level, harder as you go.
+const WORDS = ["PUZZLE","BRAIN","MIRROR","ORANGE","CANDLE","ROCKET","PLANET","WINDOW","GARDEN","SILVER"];
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function rint(r, lo, hi) { return lo + Math.floor(r() * (hi - lo + 1)); }
+function gen(i) {
+  const r = mulberry32(i * 7919 + 13);
+  const sc = 1 + Math.floor(i / 50);
+  switch (i % 4) {
+    case 0: {
+      const a = rint(r, 1, 10 * sc), d = rint(r, 2, 5 * sc);
+      const t = [0, 1, 2, 3].map(k => a + k * d);
+      return { type: "t", q: `What comes next? ${t.join(", ")}, ?`, ans: [String(a + 4 * d)] };
+    }
+    case 1: {
+      const a = rint(r, 2, 9 + sc * 3), b = rint(r, 2, 9 + sc * 3), c = rint(r, 2, 20 * sc);
+      return { type: "t", q: `What is ${a} × ${b} + ${c}?`, ans: [String(a * b + c)] };
+    }
+    case 2: {
+      const n = rint(r, 4, Math.min(30, 4 + sc * 3));
+      return { type: "t", q: `How many stars? ${Array(n).fill("⭐").join(" ")}`, ans: [String(n)] };
+    }
+    default: {
+      const w = WORDS[rint(r, 0, WORDS.length - 1)];
+      const p = rint(r, 1, w.length);
+      return { type: "t", q: `What is letter number ${p} of ${w}?`, ans: [w[p - 1].toLowerCase()] };
+    }
+  }
+}
+function norm(lv) {
+  if (lv.type) return lv;
+  if (lv[0] === "t") return { type: "t", q: lv[1], ans: lv[2] };
+  return { type: lv[0], q: lv[1], opts: lv[2], ans: lv[3] };
+}
+const LEVELS = RIDDLES.map(norm);
+for (let i = LEVELS.length; i < TOTAL; i++) LEVELS.push(gen(i));
+
+let cur = 0, wrong = 0, hintUsed = false, buttons = [];
+
+function updateCoins() {
+  $("coins").textContent = S.unlimited ? "∞ coins" : `🪙 ${S.coins}`;
+  $("unlimBtn").textContent = `Unlimited money: ${S.unlimited ? "ON" : "OFF"}`;
+}
+function addCoins(n) { S.coins += n; save(); updateCoins(); }
+function spend(n) {
+  if (S.unlimited) return true;
+  if (S.coins < n) { $("msg").textContent = "Not enough coins. Solve levels to earn more!"; return false; }
+  S.coins -= n; save(); updateCoins(); return true;
+}
+
+function renderMenu() {
+  $("stat").textContent = `${Math.min(S.progress, TOTAL)} / ${TOTAL} solved`;
+  let html = "";
+  for (let i = 0; i < TOTAL; i++) {
+    const ok = allowed(i);
+    const cls = !ok ? "locked" : i < S.progress ? "done" : "";
+    html += `<button class="${cls}" data-lv="${i}" ${ok ? "" : "disabled"}>${i + 1}</button>`;
+  }
+  $("grid").innerHTML = html;
+  $("grid").querySelectorAll("button").forEach(b => b.onclick = () => openLevel(+b.dataset.lv));
+  $("adminBtn").classList.toggle("hidden", !S.admin);
+}
+
+function currentUser() { return S.users.find(x => x.name === S.me); }
+
+function allowed(i) {
+  if (S.admin) return true;
+  const u = currentUser();
+  return !!S.me && !(u && u.banned) && i <= S.progress && i < S.maxOpen;
+}
+
+function renderHome() {
+  const u = currentUser();
+  const banned = !!(u && u.banned);
+  const next = Math.min(S.progress, TOTAL - 1);
+  $("hSolved").textContent = Math.min(S.progress, TOTAL);
+  $("hLevel").textContent = next + 1;
+  $("hCoins").textContent = S.unlimited ? "∞" : S.coins;
+  $("uname").textContent = banned ? "⛔ Banned" : S.me ? `👤 ${S.me}` : "";
+  const canPlay = S.admin || (!!S.me && !banned);
+  $("playBtn").disabled = !canPlay;
+  $("playBtn").textContent = S.progress >= TOTAL ? "▶ Continue · Level 1"
+    : S.progress >= S.maxOpen ? "🔒 Waiting for admin to open levels"
+    : `▶ Continue · Level ${next + 1}`;
+}
+
+function renderUsers() {
+  $("openCount").textContent = S.maxOpen;
+  $("solvedStat").textContent = S.progress >= TOTAL ? "🏆 All levels solved" : `Solved ${S.progress} / ${TOTAL}`;
+  $("userList").innerHTML = S.users.length ? S.users.map((u, i) =>
+    `<div style="background:rgba(255,255,255,.06);border-radius:12px;padding:10px;margin-top:8px;text-align:left">
+      <div><b>${u.name}</b> · 🪙 ${u.coins}${u.banned ? ' · <span style="color:#ef4444">BANNED</span>' : ""}</div>
+      <div class="row"><button data-a="coin" data-i="${i}">+100 coins</button><button data-a="ban" data-i="${i}">${u.banned ? "Unban" : "Ban"}</button><button data-a="del" data-i="${i}">Delete</button></div>
+    </div>`).join("") : '<div class="stat">No users yet.</div>';
+}
+
+function refresh() { renderHome(); renderMenu(); updateCoins(); renderUsers(); }
+
+function show(name) {
+  ["auth", "home", "menu", "play", "admin", "gate"].forEach(s => $(s).classList.toggle("hidden", s !== name));
+  $("title").classList.toggle("hidden", name !== "auth");
+  $("userTag").classList.toggle("hidden", name === "auth");
+  $("switchBtn").classList.toggle("hidden", name === "auth");
+  $("closeAuth").classList.toggle("hidden", name !== "auth" || !S.me);
+  if (name === "home") renderHome();
+  if (name === "admin") renderUsers();
+}
+
+function openLevel(i) {
+  if (!allowed(i)) return;
+  cur = i; wrong = 0; hintUsed = false; buttons = [];
+  show("play");
+  const lv = LEVELS[i];
+  $("lvlLabel").textContent = `Level ${i + 1} of ${TOTAL}`;
+  $("question").textContent = lv.q;
+  $("msg").textContent = ""; $("hint").textContent = "";
+  $("nextRow").classList.add("hidden");
+  $("hintBtn").disabled = false;
+  const area = $("area");
+  area.innerHTML = "";
+
+  if (lv.type === "c" || lv.type === "p") {
+    const wrap = document.createElement("div");
+    wrap.className = lv.type === "c" ? "opts" : "emojis";
+    lv.opts.forEach((opt, idx) => {
+      const b = document.createElement("button");
+      b.textContent = opt;
+      b.dataset.i = idx;
+      b.onclick = () => answer(b, idx === lv.ans);
+      buttons.push(b);
+      wrap.appendChild(b);
+    });
+    area.appendChild(wrap);
+  } else {
+    const input = document.createElement("input");
+    input.placeholder = "Type your answer";
+    input.autocomplete = "off";
+    const submit = document.createElement("button");
+    submit.className = "primary";
+    submit.textContent = "Check";
+    const check = () => {
+      const val = input.value.trim().toLowerCase();
+      if (!val) return;
+      answer(submit, lv.ans.includes(val));
+    };
+    submit.onclick = check;
+    input.onkeydown = e => { if (e.key === "Enter") check(); };
+    const row = document.createElement("div");
+    row.className = "row";
+    row.appendChild(submit);
+    area.appendChild(input);
+    area.appendChild(row);
+    buttons.push(input);
+    setTimeout(() => input.focus(), 50);
+  }
+  updateCoins();
+}
+
+function answer(btn, correct) {
+  if (correct) {
+    if (btn.tagName === "BUTTON") btn.classList.add("ok");
+    $("msg").textContent = S.unlimited ? "Correct! ✨" : `Correct! +${WIN_REWARD} coins 🪙`;
+    buttons.forEach(el => el.disabled = true);
+    $("hintBtn").disabled = true;
+    S.coins += WIN_REWARD;
+    if (cur + 2 > S.maxOpen) S.maxOpen = Math.min(TOTAL, cur + 2);
+    if (cur >= S.progress) S.progress = cur + 1;
+    save(); updateCoins();
+    $("nextRow").classList.remove("hidden");
+
+  } else {
+    if (btn.tagName === "BUTTON") { btn.classList.add("bad"); setTimeout(() => btn.classList.remove("bad"), 500); }
+    wrong++;
+    $("msg").textContent = "Not quite. Think sideways!";
+  }
+}
+
+function hint() {
+  const lv = LEVELS[cur];
+  if (hintUsed) return;
+  if (!spend(HINT_COST)) return;
+  hintUsed = true;
+  $("hintBtn").disabled = true;
+  if (lv.type === "t") {
+    const a = lv.ans[0];
+    $("hint").textContent = `Starts with "${a[0].toUpperCase()}" and has ${a.length} characters.`;
+  } else {
+    const wrongBtn = buttons.find(b => !b.disabled && +b.dataset.i !== lv.ans);
+    if (wrongBtn) { wrongBtn.disabled = true; wrongBtn.classList.add("off"); }
+    $("hint").textContent = "One wrong option has been removed.";
+  }
+}
+
+function skip() {
+  if (!spend(SKIP_COST)) return;
+  if (cur + 2 > S.maxOpen) S.maxOpen = Math.min(TOTAL, cur + 2);
+  if (cur >= S.progress) S.progress = cur + 1;
+  save();
+  goNext();
+}
+
+function goNext() {
+  if (cur + 1 < TOTAL && allowed(cur + 1)) openLevel(cur + 1);
+  else { show("menu"); renderMenu(); }
+}
+
+// Admin: tap the title 5 times to open the passcode prompt.
+let titleTaps = 0;
+$("title").onclick = () => {
+  if (++titleTaps < 5) return;
+  titleTaps = 0;
+  $("adminHome").click();
+};
+$("adminBtn").onclick = () => show("admin");
+$("adminHome").onclick = () => {
+  if (S.admin) { show("admin"); return; }
+  $("passIn").value = ""; $("passMsg").textContent = "";
+  show("gate");
+  setTimeout(() => $("passIn").focus(), 50);
+};
+$("gateBack").onclick = () => { if (S.me) { show("home"); renderHome(); } else show("auth"); };
+$("passGo").onclick = () => {
+  if ($("passIn").value === "hamza2009") { S.admin = true; save(); renderMenu(); $("passIn").value = ""; show("admin"); }
+  else $("passMsg").textContent = "Wrong passcode";
+};
+$("passIn").onkeydown = e => { if (e.key === "Enter") $("passGo").click(); };
+$("closeAdmin").onclick = () => { if (S.me) { show("home"); renderHome(); } else show("auth"); };
+$("closeAdminX").onclick = () => $("closeAdmin").click();
+$("logoutAdmin").onclick = () => { S.admin = false; S.unlimited = false; save(); updateCoins(); if (S.me) { show("home"); renderHome(); } else show("auth"); };
+$("unlimBtn").onclick = () => { S.unlimited = !S.unlimited; save(); updateCoins(); };
+$("add1k").onclick = () => addCoins(1000);
+$("open10").onclick = () => { S.maxOpen = Math.min(TOTAL, S.maxOpen + 10); save(); refresh(); };
+$("openAll").onclick = () => { S.maxOpen = TOTAL; save(); refresh(); };
+$("lockBack").onclick = () => { S.maxOpen = 1; save(); refresh(); };
+$("startAgain").onclick = () => { S.progress = 0; S.maxOpen = 1; save(); refresh(); };
+$("jumpBtn").onclick = () => {
+  const n = parseInt($("jumpIn").value, 10);
+  if (n >= 1 && n <= TOTAL) { S.maxOpen = Math.max(S.maxOpen, n); save(); refresh(); openLevel(n - 1); }
+};
+$("addUser").onclick = () => {
+  const name = $("newUser").value.trim();
+  if (!name || S.users.some(u => u.name === name)) return;
+  S.users.push({ name, coins: 0, banned: false });
+  $("newUser").value = ""; save(); refresh();
+};
+$("userList").onclick = e => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  const i = +b.dataset.i, u = S.users[i];
+  if (!u) return;
+  if (b.dataset.a === "coin") u.coins += 100;
+  if (b.dataset.a === "ban") u.banned = !u.banned;
+  if (b.dataset.a === "del") { S.users.splice(i, 1); if (S.me === u.name) S.me = null; }
+  save(); refresh();
+};
+let authMode = "login";
+function setAuthMode(m) {
+  authMode = m;
+  $("tabLogin").className = m === "login" ? "primary" : "";
+  $("tabSignup").className = m === "signup" ? "primary" : "";
+  $("authGo").textContent = m === "login" ? "Login" : "Create account";
+  $("authMsg").textContent = "";
+}
+$("tabLogin").onclick = () => setAuthMode("login");
+$("tabSignup").onclick = () => setAuthMode("signup");
+$("authPass").onkeydown = e => { if (e.key === "Enter") $("authGo").click(); };
+$("authGo").onclick = () => {
+  const name = $("authUser").value.trim(), pw = $("authPass").value;
+  const msg = t => { $("authMsg").textContent = t; };
+  if (!name || !pw) return msg("Enter a username and password");
+  let u = S.users.find(x => x.name === name);
+  if (authMode === "signup") {
+    if (u) return msg("That username is taken");
+    u = { name, pw, coins: 0, banned: false };
+    S.users.push(u);
+  } else {
+    if (!u) return msg("No account with that name");
+    if (u.pw === undefined) u.pw = pw;
+    else if (u.pw !== pw) return msg("Wrong password");
+  }
+  if (u.banned) return msg("This account is banned");
+  S.me = u.name;
+  $("authUser").value = ""; $("authPass").value = "";
+  save(); refresh(); show("home");
+};
+$("switchBtn").onclick = () => { setAuthMode("login"); show("auth"); };
+$("closeAuth").onclick = () => { show("home"); renderHome(); };
+
+
+$("hintBtn").onclick = hint;
+$("skipBtn").onclick = skip;
+$("next").onclick = goNext;
+$("back").onclick = () => { show("menu"); renderMenu(); };
+$("homeFromPlay").onclick = () => { show("home"); renderHome(); };
+
+updateCoins();
+renderMenu();
+$("playBtn").onclick = () => openLevel(S.progress >= TOTAL ? 0 : S.progress);
+$("levelsBtn").onclick = () => { show("menu"); renderMenu(); };
+
+$("homeFromMenu").onclick = () => { show("home"); renderHome(); };
+setAuthMode("signup");
+show(S.me ? "home" : "auth");
+renderHome();
+</script>
+</body>
+</html>
